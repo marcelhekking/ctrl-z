@@ -127,7 +127,7 @@ class Backup:
 
         :param skip_db: list of db aliases to skip
         """
-        logger.info("Backing up %d databases", len(settings.DATABASES))
+        logger.info("Backing up the %d databases", len(settings.DATABASES))
         for alias, db_config in settings.DATABASES.items():
             if skip_db and alias in skip_db:
                 continue
