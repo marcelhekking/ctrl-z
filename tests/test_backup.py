@@ -97,11 +97,15 @@ def test_backup_db_version_file(tmpdir, settings, config_writer):
     backup.full(db=True, files=False, version="TEST")
 
     backup_dir = tmpdir.join("backups").listdir()[0]
-    version_dir = backup_dir.listdir()[0]
-    assert version_dir.basename == "version"
-    version_file = version_dir.listdir()[0]
-    assert version_file.basename == "TEST.txt"
-    assert version_file.readlines() == ["TEST"]
+    # since the order listdir is unpredictable, we need to find the version directory
+    # and then check the file inside
+    basenames = [dir.basename for dir in backup_dir.listdir()]
+    assert "version" in basenames
+    index_of_version = [index for index, value in enumerate(basenames) if value == 'version']
+    version_dir = backup_dir.listdir()[index_of_version[0]]
+    version_file = version_dir.listdir()
+    assert version_file[0].basename == "TEST.txt"
+    assert version_file[0].readlines() == ["TEST"]
     filenames = [item.basename for item in backup_dir.join("db").listdir()]
     port_1 = settings.DATABASES["default"]["PORT"]
     port_2 = settings.DATABASES["secondary"]["PORT"]
